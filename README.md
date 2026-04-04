@@ -2,8 +2,6 @@
 
 A modern, feature-rich spin wheel application built with PyQt5, perfect for random draws, giveaways, decision-making, or just for fun. Customize every aspect of the wheel with an intuitive interface and stunning visual effects.
 
-!https://via.placeholder.com/800x450/4A148C/FFFFFF?text=LuckyWheel+Demo
-
 ## ✨ Features
 
 ### 🎨 **Visual Customization**
