@@ -1,0 +1,32 @@
+[
+  {
+    "color": "#E74C3C",
+    "text": "一等奖",
+    "text_color": "#ffffff",
+    "weight": 1
+  },
+  {
+    "color": "#3498DB",
+    "text": "二等奖",
+    "text_color": "#ffffff",
+    "weight": 15
+  },
+  {
+    "color": "#2ECC71",
+    "text": "三等奖",
+    "text_color": "#55ffff",
+    "weight": 30
+  },
+  {
+    "color": "#F39C12",
+    "text": "幸运奖",
+    "text_color": "#FFFFFF",
+    "weight": 50
+  },
+  {
+    "color": "#9B59B6",
+    "text": "谢谢参与",
+    "text_color": "#FFFFFF",
+    "weight": 80
+  }
+]
