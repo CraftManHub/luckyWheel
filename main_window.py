@@ -7,6 +7,8 @@ from PyQt5.QtGui import QPixmap, QMovie, QPainter, QColor, QBrush, QPainterPath,
 from wheel_widget import WheelWidget
 from config_panel import ConfigPanel, DEFAULT_OPTIONS
 from bg_drawer import BgDrawer
+from petal_overlay import PetalOverlay
+from sound_player import SoundPlayer
 
 def _get_config_dir():
     base = os.environ.get("APPDATA") or os.path.expanduser("~")
@@ -24,6 +26,15 @@ class RootWidget(QWidget):
         super().__init__(parent)
         self._bg_pixmap = None
         self._bg_movie = None
+        self._petal_overlay: "PetalOverlay | None" = None
+
+    def set_petal_overlay(self, overlay: "PetalOverlay"):
+        self._petal_overlay = overlay
+
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        if self._petal_overlay and event.button() == Qt.LeftButton:
+            self._petal_overlay.burst(event.pos())
 
     def set_background(self, path):
         if self._bg_movie:
@@ -113,6 +124,14 @@ class MainWindow(QMainWindow):
         # 右侧背景抽屉
         self.drawer = BgDrawer(self.root)
 
+        # 花瓣特效 overlay（覆盖整个 root）
+        self.petal_overlay = PetalOverlay(self.root)
+        self.petal_overlay.resize(self.root.size())
+        self.root.set_petal_overlay(self.petal_overlay)
+
+        # 音效播放器（懒初始化，避免阻塞启动）
+        self._sound = None
+
         # 信号连接
         self.panel.config_changed.connect(self._on_config_changed)
         self.panel.spin_clicked.connect(self._on_spin_clicked)
@@ -135,6 +154,8 @@ class MainWindow(QMainWindow):
         w, h = self.root.width(), self.root.height()
         self.btn_close.move(w - 48, 12)
         self.drawer.reposition(w, h)
+        self.petal_overlay.resize(w, h)
+        self.petal_overlay.raise_()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -151,6 +172,11 @@ class MainWindow(QMainWindow):
     def mouseReleaseEvent(self, event):
         self._drag_pos = None
 
+    def closeEvent(self, event):
+        if self._sound:
+            self._sound.cleanup()
+        super().closeEvent(event)
+
     def _on_config_changed(self, options):
         # options 是全量（含份数0），转盘只显示有效份数的
         wheel_opts = [o for o in options if o.get("quota", -1) != 0]
@@ -158,6 +184,14 @@ class MainWindow(QMainWindow):
         self._save_config(options)
 
     def _on_spin_clicked(self):
+        wheel_opts = self.panel.get_wheel_options()
+        if not wheel_opts:
+            self.panel.show_result("没有可用选项！")
+            return
+        # 懒初始化音效（首次点击时生成 WAV，避免启动卡顿）
+        if self._sound is None:
+            self._sound = SoundPlayer()
+        self._sound.play_random()
         self.panel.set_spinning(True)
         self.wheel.spin()
 
