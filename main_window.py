@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
         self.drawer.load_bg()
         options = self._load_config()
         self.panel.load_options(options)
-        self.wheel.set_options(self.panel.get_options())
+        self.wheel.set_options(self.panel.get_wheel_options())
 
         self._reposition_overlays()
 
@@ -152,7 +152,9 @@ class MainWindow(QMainWindow):
         self._drag_pos = None
 
     def _on_config_changed(self, options):
-        self.wheel.set_options(options)
+        # options 是全量（含份数0），转盘只显示有效份数的
+        wheel_opts = [o for o in options if o.get("quota", -1) != 0]
+        self.wheel.set_options(wheel_opts)
         self._save_config(options)
 
     def _on_spin_clicked(self):
@@ -160,6 +162,12 @@ class MainWindow(QMainWindow):
         self.wheel.spin()
 
     def _on_spin_finished(self, winner_text):
+        # 扣减份数，获取全量选项（含份数为0的）存盘
+        all_options = self.panel.consume_quota(winner_text)
+        self._save_config(all_options)
+        # 刷新转盘（只显示份数>0或无限的）
+        wheel_options = self.panel.get_wheel_options()
+        self.wheel.set_options(wheel_options)
         self.panel.show_result(winner_text)
 
     def _load_config(self):
