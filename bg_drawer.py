@@ -2,42 +2,74 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QLabel, QFileDialog, QFrame
 )
-from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal, QRect
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal, QRect, QRectF
+from PyQt5.QtGui import QFont, QColor, QPainter, QBrush, QPainterPath
+import os, json
+
+def _get_config_dir():
+    base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    path = os.path.join(base, "LuckyWheel")
+    os.makedirs(path, exist_ok=True)
+    return path
+
+BG_CONFIG_FILE = os.path.join(_get_config_dir(), "bg_config.json")
 
 DRAWER_W = 220
 
-DRAWER_STYLE = """
-    QWidget#drawer {
-        background-color: #111827;
-        border-left: 2px solid #2D3748;
-    }
-    QLabel { background: transparent; }
-"""
-
+# 更新按钮样式
 BTN_STYLE = """
     QPushButton {
-        background: #1E2A3A;
-        color: #CBD5E0; border: 1px solid #2D3748;
-        border-radius: 8px; padding: 8px 12px;
-        font-family: 微软雅黑; font-size: 13px; text-align: left;
+        background: rgba(30, 41, 59, 0.9);
+        color: #CBD5E0; 
+        border: 1px solid rgba(71, 85, 105, 0.7);
+        border-radius: 8px; 
+        padding: 8px 12px;
+        font-family: 微软雅黑; 
+        font-size: 13px; 
+        text-align: left;
     }
-    QPushButton:hover { background: #2D3E52; color: #FFFFFF; }
+    QPushButton:hover { 
+        background: rgba(45, 62, 82, 0.9); 
+        color: #FFFFFF; 
+    }
+    QPushButton:pressed { 
+        background: rgba(15, 23, 42, 0.9); 
+    }
 """
 
 TOGGLE_STYLE = """
     QPushButton {
-        background-color: #1A1A2E;
-        color: #A0AEC0; border: 1px solid #2D3748;
+        background-color: rgba(26, 26, 46, 0.9);
+        color: #A0AEC0; 
+        border: 1px solid rgba(71, 85, 105, 0.7);
         border-radius: 6px 0 0 6px;
         font-size: 16px;
         border-right: none;
     }
-    QPushButton:hover { background-color: #2D3E52; color: white; }
+    QPushButton:hover { 
+        background-color: rgba(45, 62, 82, 0.9); 
+        color: white; 
+    }
 """
 
-SECTION_LABEL = "color: #718096; font-family: 微软雅黑; font-size: 11px; background: transparent;"
-VALUE_LABEL = "color: #A0AEC0; font-family: 微软雅黑; font-size: 11px; padding: 2px 0; background: transparent;"
+# 更新标签样式
+SECTION_LABEL = """
+    color: #CBD5E0; 
+    font-family: 微软雅黑; 
+    font-size: 11px; 
+    background: transparent;
+    padding: 4px 0;
+    font-weight: 600;
+"""
+
+VALUE_LABEL = """
+    color: #E2E8F0; 
+    font-family: 微软雅黑; 
+    font-size: 11px; 
+    padding: 2px 0; 
+    background: transparent;
+    margin: 4px 0;
+"""
 
 
 class BgDrawer(QWidget):
@@ -50,8 +82,13 @@ class BgDrawer(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.setObjectName("drawer")
-        self.setStyleSheet(DRAWER_STYLE)
         self._open = False
+        
+        self.bg_config = self._load_default_bg()
+
+        # 启用透明度
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        
         self._anim = QPropertyAnimation(self, b"geometry")
         self._anim.setDuration(280)
         self._anim.setEasingCurve(QEasingCurve.OutCubic)
@@ -68,20 +105,42 @@ class BgDrawer(QWidget):
 
         # 初始隐藏（收起状态）
         self.hide()
-
+    
+    def paintEvent(self, event):
+        """绘制磨砂背景"""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        
+        # 绘制磨砂背景
+        painter.setBrush(QBrush(QColor(30, 41, 59, 217)))  # 85% 透明度
+        painter.setPen(Qt.NoPen)
+        
+        # 创建圆角矩形路径 - 使用QRectF
+        rect_f = QRectF(self.rect())
+        painter.drawRoundedRect(rect_f, 12, 12)
+        
+        # 绘制左侧边框
+        painter.setPen(QColor(71, 85, 105, 128))
+        painter.drawLine(0, 12, 0, self.height() - 12)
+        
+        # 调用父类的绘制方法，确保子控件正确显示
+        super().paintEvent(event)
+    
     def _build_ui(self):
+        # 设置一个布局，确保子控件能够正确显示
+        self.setContentsMargins(0, 0, 0, 0)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 24, 16, 24)
         layout.setSpacing(16)
 
         title = QLabel("背景设置")
         title.setFont(QFont("微软雅黑", 13, QFont.Bold))
-        title.setStyleSheet("color: #FFFFFF;")
+        title.setStyleSheet("color: #FFFFFF; background: transparent;")
         layout.addWidget(title)
 
         line = QFrame()
         line.setFrameShape(QFrame.HLine)
-        line.setStyleSheet("color: rgba(255,255,255,0.08);")
+        line.setStyleSheet("background-color: rgba(255, 255, 255, 0.1);")
         layout.addWidget(line)
 
         # ── 转盘背景 ──
@@ -122,10 +181,43 @@ class BgDrawer(QWidget):
 
         layout.addStretch()
 
+
     def _section(self, text):
         lbl = QLabel(text)
         lbl.setStyleSheet(SECTION_LABEL)
         return lbl
+
+    def load_bg(self):
+        """加载已保存的背景，并发送信号"""
+        if self.bg_config:
+            win_bg = self.bg_config.get("win_bg", "")
+            wheel_bg = self.bg_config.get("wheel_bg", "")
+            if win_bg and os.path.exists(win_bg):
+                self.lbl_win_bg.setText(os.path.basename(win_bg))
+                self.window_bg_change.emit(win_bg)
+            if wheel_bg and os.path.exists(wheel_bg):
+                self.lbl_wheel_bg.setText(os.path.basename(wheel_bg))
+                self.wheel_bg_change.emit(wheel_bg)
+
+    # ── 默认背景加载 ──
+    def _load_default_bg(self):
+        # 尝试加载默认路径
+        if os.path.exists(BG_CONFIG_FILE):
+            try:
+                with open(BG_CONFIG_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict) and data:
+                    return data
+            except Exception:
+                pass
+        return dict()
+
+    def _save_default_bg(self):
+        try:
+            with open(BG_CONFIG_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.bg_config, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
 
     # ── 转盘背景 ──
     def _pick_wheel_bg(self):
@@ -137,11 +229,16 @@ class BgDrawer(QWidget):
             import os
             self.lbl_wheel_bg.setText(os.path.basename(path))
             self.wheel_bg_change.emit(path)
+            self.bg_config["wheel_bg"] = path
+            self._save_default_bg()
 
     def _clear_wheel_bg(self):
         self.lbl_wheel_bg.setText("未设置")
         self.wheel_bg_clear.emit()
+        self.bg_config["wheel_bg"] = ""
+        self._save_default_bg()
 
+    
     # ── 全局背景 ──
     def _pick_window_bg(self):
         path, _ = QFileDialog.getOpenFileName(
@@ -152,10 +249,14 @@ class BgDrawer(QWidget):
             import os
             self.lbl_win_bg.setText(os.path.basename(path))
             self.window_bg_change.emit(path)
+            self.bg_config["win_bg"] = path
+            self._save_default_bg()
 
     def _clear_window_bg(self):
         self.lbl_win_bg.setText("未设置")
         self.window_bg_clear.emit()
+        self.bg_config["win_bg"] = ""
+        self._save_default_bg()
 
     # ── 展开/收起 ──
     def toggle(self):

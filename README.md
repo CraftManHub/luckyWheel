@@ -1,3 +1,37 @@
+
+
+
+# 🎡 LuckyWheel - 可自定义的幸运大转盘应用
+
+一个基于 PyQt5 构建的现代、功能丰富的转盘应用，适用于随机抽奖、赠品活动、决策或娱乐。通过直观的界面和炫目的视觉效果，自定义转盘的每一个细节。
+
+## ✨ 核心功能
+
+-   **🎨 深度视觉定制**：为转盘和主窗口分别设置背景，支持静态图片与动态 GIF，内置精美渐变与色彩主题。
+-   **⚙️ 灵活转盘配置**：动态添加、编辑和删除转盘选项，实时预览，多套预设配色方案。
+-   **💾 配置持久化**：自动保存用户的抽奖选项配置与背景图设置，下次启动无需重新设置。
+-   **🎯 流畅用户体验**：无边框现代化设计，支持任意位置拖拽窗口，侧滑式设置面板，高DPI适配。
+-   **📦 一键打包分发**：提供便捷脚本，可快速构建为跨平台（Windows/macOS/Linux）的独立可执行文件。
+
+## 🚀 快速使用指南
+
+1.  **启动**应用。
+2.  在右侧面板**添加/编辑**抽奖选项。
+3.  点击齿轮按钮(⚙)，在滑出的设置面板中**自定义背景**（支持图片/GIF）。
+4.  点击“**SPIN**”按钮开始旋转。
+5.  所有配置（选项、背景）将自动保存，下次启动时自动加载。
+
+## ⚙️ 技术规格
+
+-   **依赖**：Python 3.7+， PyQt5
+-   **开源**：项目代码开放，可根据需要修改或扩展。
+
+
+
+**立即打造您专属的幸运大转盘吧！** 🎯
+
+---
+
 # 🎡 LuckyWheel - Customizable Spin Wheel Application
 
 A modern, feature-rich spin wheel application built with PyQt5, perfect for random draws, giveaways, decision-making, or just for fun. Customize every aspect of the wheel with an intuitive interface and stunning visual effects.

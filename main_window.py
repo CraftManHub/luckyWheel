@@ -8,7 +8,13 @@ from wheel_widget import WheelWidget
 from config_panel import ConfigPanel, DEFAULT_OPTIONS
 from bg_drawer import BgDrawer
 
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+def _get_config_dir():
+    base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    path = os.path.join(base, "LuckyWheel")
+    os.makedirs(path, exist_ok=True)
+    return path
+
+CONFIG_FILE = os.path.join(_get_config_dir(), "config.json")
 
 
 class RootWidget(QWidget):
@@ -118,6 +124,7 @@ class MainWindow(QMainWindow):
         self.drawer.window_bg_clear.connect(self.root.clear_background)
 
         # 加载配置
+        self.drawer.load_bg()
         options = self._load_config()
         self.panel.load_options(options)
         self.wheel.set_options(self.panel.get_options())

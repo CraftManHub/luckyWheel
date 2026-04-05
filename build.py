@@ -13,7 +13,7 @@ import subprocess
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MAIN = os.path.join(SCRIPT_DIR, "main.py")
 APP_NAME = "LuckyWheel"
-ICON_NAME = "lucky.ico"
+ICON_NAME = os.path.join(SCRIPT_DIR, "lucky.ico")
 
 OUT_DIR = sys.argv[1] if len(sys.argv) > 1 else os.path.join(SCRIPT_DIR, "dist")
 

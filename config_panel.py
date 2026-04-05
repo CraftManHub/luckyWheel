@@ -93,8 +93,8 @@ class ConfigPanel(QWidget):
 
         # 标题行 + 权重切换
         title_row = QHBoxLayout()
-        title = QLabel("选项配置")
-        title.setFont(QFont("微软雅黑", 14, QFont.Bold))
+        title = QLabel("今天也有好运气")
+        title.setFont(QFont("幼圆", 14, QFont.Bold))
         title.setStyleSheet("color: #FFFFFF;")
         title_row.addWidget(title)
         title_row.addStretch()
@@ -111,7 +111,15 @@ class ConfigPanel(QWidget):
         self.table = QTableWidget(0, 3)
         self.table.setHorizontalHeaderLabels(["选项名称", "字色", "权重"])
         hh = self.table.horizontalHeader()
-        hh.setStyleSheet("QHeaderView::section { color: red; }")
+        
+        hh.setStyleSheet("""
+            QHeaderView::section {
+                color: #000000;
+                font-family: 幼圆;
+                font-size: 14px;
+                font-weight: bold;
+            }
+        """)
         hh.setSectionResizeMode(COL_TEXT,   QHeaderView.Stretch)
         hh.setSectionResizeMode(COL_COLOR,  QHeaderView.Fixed)
         hh.setSectionResizeMode(COL_WEIGHT, QHeaderView.Fixed)
