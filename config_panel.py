@@ -10,12 +10,12 @@ from PyQt5.QtGui import QFont, QColor, QBrush
 from wheel_widget import DEFAULT_COLORS
 
 DEFAULT_OPTIONS = [
-    {"text": "一等奖",  "weight": 5,   "text_color": "#FFFFFF", "quota": -1},
-    {"text": "二等奖",  "weight": 15,  "text_color": "#FFFFFF", "quota": -1},
-    {"text": "三等奖",  "weight": 30,  "text_color": "#FFFFFF", "quota": -1},
-    {"text": "幸运奖",  "weight": 50,  "text_color": "#FFFFFF", "quota": -1},
-    {"text": "谢谢参与","weight": 100, "text_color": "#FFFFFF", "quota": -1},
-    {"text": "再来一次","weight": 80,  "text_color": "#FFFFFF", "quota": -1},
+    {"text": "妙蛙种子",  "weight": 5,   "text_color": "#FFFFFF", "quota": -1},
+    {"text": "枫树叶",  "weight": 15,  "text_color": "#FFFFFF", "quota": -1},
+    {"text": "神奇魔药",  "weight": 30,  "text_color": "#FFFFFF", "quota": -1},
+    {"text": "1份遗憾",  "weight": 50,  "text_color": "#FFFFFF", "quota": -1},
+    {"text": "鼠尾草","weight": 100, "text_color": "#FFFFFF", "quota": -1},
+    {"text": "阿尔卑斯空气","weight": 80,  "text_color": "#FFFFFF", "quota": -1},
 ]
 
 # 列索引
@@ -94,13 +94,13 @@ class ConfigPanel(QWidget):
 
         # 标题行 + 权重/份数切换
         title_row = QHBoxLayout()
-        title = QLabel("今天也有好运气")
-        title.setFont(QFont("幼圆", 14, QFont.Bold))
+        title = QLabel("神秘学讲义")
+        title.setFont(QFont("幼圆", 18, QFont.Bold))
         title.setStyleSheet("color: #FFFFFF;")
         title_row.addWidget(title)
         title_row.addStretch()
 
-        self.btn_toggle_weight = QPushButton("权重")
+        self.btn_toggle_weight = QPushButton("配比")
         self.btn_toggle_weight.setCheckable(True)
         self.btn_toggle_weight.setChecked(False)
         self.btn_toggle_weight.setFixedSize(52, 26)
@@ -131,7 +131,7 @@ class ConfigPanel(QWidget):
 
         # 表格：选项名称 | 字色 | 权重 | 份数
         self.table = QTableWidget(0, 4)
-        self.table.setHorizontalHeaderLabels(["选项名称", "字色", "权重", "份数"])
+        self.table.setHorizontalHeaderLabels(["三秋的魔法袋", "颜色", "配比", "份数"])
         hh = self.table.horizontalHeader()
 
         hh.setStyleSheet("""
@@ -164,8 +164,8 @@ class ConfigPanel(QWidget):
         # 添加 / 删除
         btn_row = QHBoxLayout()
         btn_row.setSpacing(8)
-        self.btn_add = QPushButton("＋ 添加")
-        self.btn_del = QPushButton("－ 删除")
+        self.btn_add = QPushButton("＋ 放一个")
+        self.btn_del = QPushButton("－ 残忍挪走")
         for btn in (self.btn_add, self.btn_del):
             btn.setFixedHeight(32)
             btn.setStyleSheet(BTN_SECONDARY)
@@ -182,7 +182,7 @@ class ConfigPanel(QWidget):
         layout.addWidget(line)
 
         # 抽奖按钮
-        self.btn_spin = QPushButton("开 始 抽 奖")
+        self.btn_spin = QPushButton("鞭策一下三秋喵")
         self.btn_spin.setFixedHeight(56)
         self.btn_spin.setStyleSheet(BTN_PRIMARY)
         shadow = QGraphicsDropShadowEffect()
@@ -209,7 +209,7 @@ class ConfigPanel(QWidget):
     # ── 权重列显隐 ──
     def _toggle_weight_column(self, checked):
         self.table.setColumnHidden(COL_WEIGHT, not checked)
-        self.btn_toggle_weight.setText("隐藏" if checked else "权重")
+        self.btn_toggle_weight.setText("隐藏" if checked else "配比")
 
     # ── 份数列显隐 ──
     def _toggle_quota_column(self, checked):
@@ -396,9 +396,9 @@ class ConfigPanel(QWidget):
         return self.get_options()
 
     def show_result(self, text):
-        self.result_label.setText(f"🎉 恭喜获得\n{text}")
+        self.result_label.setText(f"🍀 命运女神的馈赠：\n{text}")
         self.btn_spin.setEnabled(True)
 
     def set_spinning(self, spinning):
         self.btn_spin.setEnabled(not spinning)
-        self.result_label.setText("转动中..." if spinning else "")
+        self.result_label.setText("权衡中..." if spinning else "")

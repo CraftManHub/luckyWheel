@@ -17,6 +17,7 @@ def _get_config_dir():
     return path
 
 CONFIG_FILE = os.path.join(_get_config_dir(), "config.json")
+SETTINGS_FILE = os.path.join(_get_config_dir(), "settings.json")
 
 
 class RootWidget(QWidget):
@@ -83,9 +84,9 @@ class RootWidget(QWidget):
         else:
             # 默认渐变背景
             grad = QLinearGradient(0, 0, self.width(), self.height())
-            grad.setColorAt(0, QColor("#FFD700"))     # 深紫
-            grad.setColorAt(0.5, QColor("#4A148C"))   # 紫色
-            grad.setColorAt(1, QColor("#7B1FA2"))     # 紫红
+            grad.setColorAt(0, QColor("#ff9d14"))     
+            grad.setColorAt(0.5, QColor("#596c64"))   
+            grad.setColorAt(1, QColor("#191919"))     
 
             painter.fillRect(self.rect(), QBrush(grad))
 
@@ -129,8 +130,8 @@ class MainWindow(QMainWindow):
         self.petal_overlay.resize(self.root.size())
         self.root.set_petal_overlay(self.petal_overlay)
 
-        # 音效播放器（懒初始化，避免阻塞启动）
-        self._sound = None
+        # 音效播放器（启动时扫描 sounds/ 文件夹）
+        self._sound = SoundPlayer()
 
         # 信号连接
         self.panel.config_changed.connect(self._on_config_changed)
@@ -147,6 +148,11 @@ class MainWindow(QMainWindow):
         options = self._load_config()
         self.panel.load_options(options)
         self.wheel.set_options(self.panel.get_wheel_options())
+
+        # 加载设置（静音等）
+        settings = self._load_settings()
+        self.drawer.set_muted(settings.get("muted", False))
+        self.drawer.mute_changed.connect(self._on_mute_toggled)
 
         self._reposition_overlays()
 
@@ -173,9 +179,10 @@ class MainWindow(QMainWindow):
         self._drag_pos = None
 
     def closeEvent(self, event):
-        if self._sound:
-            self._sound.cleanup()
         super().closeEvent(event)
+
+    def _on_mute_toggled(self, checked):
+        self._save_settings({"muted": checked})
 
     def _on_config_changed(self, options):
         # options 是全量（含份数0），转盘只显示有效份数的
@@ -188,10 +195,8 @@ class MainWindow(QMainWindow):
         if not wheel_opts:
             self.panel.show_result("没有可用选项！")
             return
-        # 懒初始化音效（首次点击时生成 WAV，避免启动卡顿）
-        if self._sound is None:
-            self._sound = SoundPlayer()
-        self._sound.play_random()
+        if not self.drawer.btn_mute.isChecked():
+            self._sound.play_random()
         self.panel.set_spinning(True)
         self.wheel.spin()
 
@@ -219,5 +224,23 @@ class MainWindow(QMainWindow):
         try:
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
                 json.dump(options, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+    def _load_settings(self):
+        if os.path.exists(SETTINGS_FILE):
+            try:
+                with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def _save_settings(self, patch):
+        settings = self._load_settings()
+        settings.update(patch)
+        try:
+            with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+                json.dump(settings, f, ensure_ascii=False, indent=2)
         except Exception:
             pass

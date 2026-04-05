@@ -78,6 +78,7 @@ class BgDrawer(QWidget):
     wheel_bg_clear = pyqtSignal()
     window_bg_change = pyqtSignal(str)
     window_bg_clear = pyqtSignal()
+    mute_changed = pyqtSignal(bool)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -133,7 +134,7 @@ class BgDrawer(QWidget):
         layout.setContentsMargins(16, 24, 16, 24)
         layout.setSpacing(16)
 
-        title = QLabel("背景设置")
+        title = QLabel("今日仪式")
         title.setFont(QFont("微软雅黑", 13, QFont.Bold))
         title.setStyleSheet("color: #FFFFFF; background: transparent;")
         layout.addWidget(title)
@@ -144,18 +145,18 @@ class BgDrawer(QWidget):
         layout.addWidget(line)
 
         # ── 转盘背景 ──
-        layout.addWidget(self._section("转盘背景"))
-        self.lbl_wheel_bg = QLabel("未设置")
+        layout.addWidget(self._section("魔法转盘的卷轴纸"))
+        self.lbl_wheel_bg = QLabel("[ 空空如也 ]")
         self.lbl_wheel_bg.setStyleSheet(VALUE_LABEL)
         self.lbl_wheel_bg.setWordWrap(True)
         layout.addWidget(self.lbl_wheel_bg)
 
-        btn_wheel = QPushButton("🖼  选择图片 / GIF")
+        btn_wheel = QPushButton("🖼  选择：转盘卷轴")
         btn_wheel.setStyleSheet(BTN_STYLE)
         btn_wheel.clicked.connect(self._pick_wheel_bg)
         layout.addWidget(btn_wheel)
 
-        btn_wheel_clr = QPushButton("✕  清除转盘背景")
+        btn_wheel_clr = QPushButton("✕  撕毁")
         btn_wheel_clr.setStyleSheet(BTN_STYLE)
         btn_wheel_clr.clicked.connect(self._clear_wheel_bg)
         layout.addWidget(btn_wheel_clr)
@@ -163,21 +164,38 @@ class BgDrawer(QWidget):
         layout.addSpacing(8)
 
         # ── 全局背景 ──
-        layout.addWidget(self._section("全局背景"))
-        self.lbl_win_bg = QLabel("未设置")
+        layout.addWidget(self._section("世界卷轴纸"))
+        self.lbl_win_bg = QLabel("[ 空空如也 ]")
         self.lbl_win_bg.setStyleSheet(VALUE_LABEL)
         self.lbl_win_bg.setWordWrap(True)
         layout.addWidget(self.lbl_win_bg)
 
-        btn_win = QPushButton("🖼  选择图片 / GIF")
+        btn_win = QPushButton("🖼  选择：世界卷轴")
         btn_win.setStyleSheet(BTN_STYLE)
         btn_win.clicked.connect(self._pick_window_bg)
         layout.addWidget(btn_win)
 
-        btn_win_clr = QPushButton("✕  清除全局背景")
+        btn_win_clr = QPushButton("✕  撕毁")
         btn_win_clr.setStyleSheet(BTN_STYLE)
         btn_win_clr.clicked.connect(self._clear_window_bg)
         layout.addWidget(btn_win_clr)
+
+        layout.addSpacing(8)
+
+        # ── 音效 ──
+        layout.addWidget(self._section("来自异界的声音"))
+        self.btn_mute = QPushButton("🔇  嘘，别出声")
+        self.btn_mute.setCheckable(True)
+        self.btn_mute.setChecked(False)
+        self.btn_mute.setStyleSheet(BTN_STYLE + """
+            QPushButton:checked {
+                background: rgba(255, 107, 107, 0.20);
+                border-color: rgba(255, 107, 107, 0.6);
+                color: #FF8FAB;
+            }
+        """)
+        self.btn_mute.toggled.connect(lambda checked: self.mute_changed.emit(checked))
+        layout.addWidget(self.btn_mute)
 
         layout.addStretch()
 
@@ -186,6 +204,11 @@ class BgDrawer(QWidget):
         lbl = QLabel(text)
         lbl.setStyleSheet(SECTION_LABEL)
         return lbl
+
+    def set_muted(self, muted):
+        self.btn_mute.blockSignals(True)
+        self.btn_mute.setChecked(muted)
+        self.btn_mute.blockSignals(False)
 
     def load_bg(self):
         """加载已保存的背景，并发送信号"""
@@ -233,7 +256,7 @@ class BgDrawer(QWidget):
             self._save_default_bg()
 
     def _clear_wheel_bg(self):
-        self.lbl_wheel_bg.setText("未设置")
+        self.lbl_wheel_bg.setText("[ 空空如也 ]")
         self.wheel_bg_clear.emit()
         self.bg_config["wheel_bg"] = ""
         self._save_default_bg()
@@ -253,7 +276,7 @@ class BgDrawer(QWidget):
             self._save_default_bg()
 
     def _clear_window_bg(self):
-        self.lbl_win_bg.setText("未设置")
+        self.lbl_win_bg.setText("[ 空空如也 ]")
         self.window_bg_clear.emit()
         self.bg_config["win_bg"] = ""
         self._save_default_bg()
