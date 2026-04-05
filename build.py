@@ -21,7 +21,7 @@ EXCLUDES = [
     "PyQt5.QtWebEngine",
     "PyQt5.QtWebEngineWidgets",
     "PyQt5.QtWebEngineCore",
-    "PyQt5.QtNetwork",
+    # "PyQt5.QtNetwork",
     "PyQt5.QtBluetooth",
     "PyQt5.QtNfc",
     "PyQt5.QtPositioning",
@@ -32,7 +32,7 @@ EXCLUDES = [
     "PyQt5.QtTest",
     "PyQt5.QtXml",
     "PyQt5.QtXmlPatterns",
-    "PyQt5.QtMultimedia",
+    # QtMultimedia 已使用，不可排除
     "PyQt5.QtMultimediaWidgets",
     "PyQt5.QtDesigner",
     "PyQt5.QtHelp",
@@ -69,6 +69,9 @@ def build():
         "--distpath", OUT_DIR,
         "--workpath", os.path.join(SCRIPT_DIR, "build"),
         "--specpath", SCRIPT_DIR,
+        # 音效模块需要 QtMultimedia，确保隐式导入
+        "--hidden-import", "PyQt5.QtMultimedia",
+        "--hidden-import", "PyQt5.sip",
     ]
     for mod in EXCLUDES:
         cmd += ["--exclude-module", mod]

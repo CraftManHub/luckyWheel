@@ -20,9 +20,11 @@ def _find_sounds_dir():
     """返回 sounds 目录路径（不保证存在），以及找到的音频文件列表"""
     candidates = []
 
-    # 1. 程序旁边（开发模式：__file__ 所在目录；打包模式：exe 所在目录）
+    # 1. exe 所在目录旁的 sounds/（onefile 打包：sys.executable 就是 exe 路径）
+    #    开发模式：__file__ 所在目录
     if getattr(sys, "frozen", False):
-        base = os.path.dirname(sys.executable)
+        # onefile：exe 路径；onedir：同样是 exe 路径
+        base = os.path.dirname(os.path.abspath(sys.executable))
     else:
         base = os.path.dirname(os.path.abspath(__file__))
     candidates.append(os.path.join(base, "sounds"))
@@ -41,7 +43,7 @@ def _find_sounds_dir():
             if files:
                 return d, files
 
-    # 没有找到，返回第一个候选路径（方便用户知道放哪里）
+    # 没有找到音频文件，返回第一个候选路径供提示用
     return candidates[0], []
 
 
