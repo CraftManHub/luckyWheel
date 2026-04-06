@@ -204,9 +204,9 @@ class MainWindow(QMainWindow):
         # 扣减份数，获取全量选项（含份数为0的）存盘
         all_options = self.panel.consume_quota(winner_text)
         self._save_config(all_options)
-        # 刷新转盘（只显示份数>0或无限的）
+        # 刷新转盘（只显示份数>0或无限的），保留当前角度不跳回原位
         wheel_options = self.panel.get_wheel_options()
-        self.wheel.set_options(wheel_options)
+        self.wheel.set_options(wheel_options, reset_angle=False)
         self.panel.show_result(winner_text)
 
     def _load_config(self):
