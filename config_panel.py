@@ -29,7 +29,7 @@ BTN_PRIMARY = """
         background: qlineargradient(x1:0,y1:0,x2:0,y2:1,
             stop:0 #FF6B6B, stop:1 #EE5A24);
         color: white; border: none; border-radius: 10px;
-        font-family: 微软雅黑; font-size: 16px; font-weight: bold;
+        font-family: 华文行楷; font-size: 30px; font-weight: bold;
         letter-spacing: 4px;
     }
     QPushButton:hover { background: qlineargradient(x1:0,y1:0,x2:0,y2:1,
@@ -131,7 +131,7 @@ class ConfigPanel(QWidget):
 
         # 表格：选项名称 | 字色 | 权重 | 份数
         self.table = QTableWidget(0, 4)
-        self.table.setHorizontalHeaderLabels(["三秋的魔法袋", "颜色", "配比", "份数"])
+        self.table.setHorizontalHeaderLabels(["巨人族的魔法袋", "颜色", "配比", "份数"])
         hh = self.table.horizontalHeader()
 
         hh.setStyleSheet("""
@@ -165,7 +165,7 @@ class ConfigPanel(QWidget):
         btn_row = QHBoxLayout()
         btn_row.setSpacing(8)
         self.btn_add = QPushButton("＋ 放一个")
-        self.btn_del = QPushButton("－ 残忍挪走")
+        self.btn_del = QPushButton("－ 挪走它！")
         for btn in (self.btn_add, self.btn_del):
             btn.setFixedHeight(32)
             btn.setStyleSheet(BTN_SECONDARY)
@@ -182,7 +182,7 @@ class ConfigPanel(QWidget):
         layout.addWidget(line)
 
         # 抽奖按钮
-        self.btn_spin = QPushButton("鞭策一下三秋喵")
+        self.btn_spin = QPushButton("开启仪式")
         self.btn_spin.setFixedHeight(56)
         self.btn_spin.setStyleSheet(BTN_PRIMARY)
         shadow = QGraphicsDropShadowEffect()
